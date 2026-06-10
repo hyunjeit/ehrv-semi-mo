@@ -1,0 +1,49 @@
+#include "UIManager.h"
+
+namespace csopesy {
+
+UIManager& UIManager::getInstance() {
+    static UIManager instance;
+    return instance;
+}
+
+void UIManager::initialize() {
+    windows.clear();
+    m_shutdownRequested = false;
+}
+
+void UIManager::registerWindow(const std::string& name, std::shared_ptr<AWindow> window) {
+    windows[name] = window;
+}
+
+void UIManager::showWindow(const std::string& name) {
+    auto it = windows.find(name);
+    if (it != windows.end()) {
+        it->second->show();
+    }
+}
+
+void UIManager::hideWindow(const std::string& name) {
+    auto it = windows.find(name);
+    if (it != windows.end()) {
+        it->second->hide();
+    }
+}
+
+void UIManager::renderAllWindows() {
+    for (auto& [name, window] : windows) {
+        if (window->isShown()) {
+            window->draw();
+        }
+    }
+}
+
+void UIManager::requestShutdown() {
+    m_shutdownRequested = true;
+}
+
+bool UIManager::isShutdownRequested() const {
+    return m_shutdownRequested;
+}
+
+} // namespace csopesy

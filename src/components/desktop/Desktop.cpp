@@ -31,7 +31,11 @@ void Desktop::loadWallpaper() {
     unsigned char* data = stbi_load("assets/wallpaper.png", &wallpaperWidth, &wallpaperHeight, &channels, 4);
 
     if (!data) {
-        std::cerr << "[WARNING] Failed to load wallpaper from assets/wallpaper.png — using fallback background" << std::endl;
+        data = stbi_load("assets/wallpaper.jpg", &wallpaperWidth, &wallpaperHeight, &channels, 4);
+    }
+
+    if (!data) {
+        std::cerr << "[WARNING] Failed to load wallpaper from assets/wallpaper.{png,jpg} — using fallback background" << std::endl;
         wallpaperLoaded = false;
         return;
     }

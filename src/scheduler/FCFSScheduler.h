@@ -2,7 +2,7 @@
 
 #include "Process.h"
 
-#include <queue>
+#include <deque>
 #include <vector>
 #include <memory>
 #include <mutex>
@@ -40,7 +40,7 @@ public:
 private:
     void schedulerLoop();
 
-    std::queue<std::shared_ptr<Process>> readyQueue;
+    std::deque<std::shared_ptr<Process>> readyQueue;
 
     std::vector<std::shared_ptr<Process>> runningProcesses;
     std::vector<std::shared_ptr<Process>> finishedProcesses;

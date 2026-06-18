@@ -91,7 +91,7 @@ void FCFSScheduler::createProcesses(int count)
 
         process->timestamp = getTimestamp();
 
-        readyQueue.push(process);
+        readyQueue.push_back(process);
     }
 }
 
@@ -104,7 +104,7 @@ FCFSScheduler::getNextProcess()
         return nullptr;
 
     auto process = readyQueue.front();
-    readyQueue.pop();
+    readyQueue.pop_front();
 
     runningProcesses.push_back(process);
 
@@ -136,11 +136,28 @@ void FCFSScheduler::screen_ls()
         << "\n---------------------------------\n";
 
     std::cout
-        << "Running Processes:\n";
+        << "Processes in the Ready Queue: "
+        << readyQueue.size()
+        << "\n";
+
+    for (auto& p : readyQueue)
+    {
+        std::cout
+            << "\t"
+            << p->name
+            << "\t"
+            << p->timestamp
+            << "\t\tReady"
+            << "\n";
+    }
+
+    std::cout
+        << "\nRunning Processes:\n";
 
     for (auto& p : runningProcesses)
     {
         std::cout
+            << "\t"
             << p->name
             << "\t"
             << p->timestamp
@@ -159,6 +176,7 @@ void FCFSScheduler::screen_ls()
     for (auto& p : finishedProcesses)
     {
         std::cout
+            << "\t"
             << p->name
             << "\t"
             << p->timestamp
@@ -201,20 +219,28 @@ void FCFSScheduler::exportReport()
         << "=================================\n\n";
 
     file
-        << "Running Processes:\n";
+        << "Ready Queue (" << readyQueue.size() << "):\n";
+
+    for (auto& p : readyQueue)
+    {
+        file
+            << "\t" << p->name
+            << " | " << p->timestamp
+            << " | Ready"
+            << "\n";
+    }
+
+    file
+        << "\nRunning Processes:\n";
 
     for (auto& p : runningProcesses)
     {
         file
-            << p->name
-            << " | "
-            << p->timestamp
-            << " | Core: "
-            << p->assignedCore
-            << " | "
-            << p->completedPrints
-            << " / "
-            << p->totalPrints
+            << "\t" << p->name
+            << " | " << p->timestamp
+            << " | Core: " << p->assignedCore
+            << " | " << p->completedPrints
+            << " / " << p->totalPrints
             << "\n";
     }
 
@@ -224,13 +250,11 @@ void FCFSScheduler::exportReport()
     for (auto& p : finishedProcesses)
     {
         file
-            << p->name
-            << " | "
-            << p->timestamp
+            << "\t" << p->name
+            << " | " << p->timestamp
             << " | Finished | "
             << p->completedPrints
-            << " / "
-            << p->totalPrints
+            << " / " << p->totalPrints
             << "\n";
     }
 

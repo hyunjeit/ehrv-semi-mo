@@ -198,6 +198,8 @@ int main(int argc, char* argv[])
                         std::cout << "  Config missing or empty.\n";
                         continue;
                     }
+
+                    scheduler.initializeConfig(config);
                     
                     scheduler.start();
                     isInitialized = true;

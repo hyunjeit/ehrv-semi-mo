@@ -26,9 +26,17 @@ static void showMarquee()
     clearScreen();
 
     std::cout
-        << "  =====================================================\n"
-        << "            CSOPESY Operating System Simulator\n"
-        << "  =====================================================\n\n";
+            << "  =====================================================\n"
+            << "            CSOPESY Operating System Simulator\n"
+            << "  =====================================================\n\n"
+            << "  Welcome to CSOPESY Emulator!\n\n"
+            << "  Developers:\n"
+            << "  Dela Cruz, Ethan Iago\n"
+            << "  Dizon, Rohann Gabriel\n"
+            << "  Tandingan, Hyun Jei\n"
+            << "  Valdez, Pulvert\n\n"
+            << "  Type 'initialize' to run\n"
+            << "  -----------------------------------------------------\n";
 }
 
 static void bootSequence()
@@ -125,14 +133,10 @@ int main(int argc, char* argv[])
 
     if (consoleMode)
     {
+        bool isInitialized = false;
+        csopesy::scheduler::FCFSScheduler scheduler; 
+
         showMarquee();
-        bootSequence();
-
-        csopesy::scheduler::FCFSScheduler scheduler;
-
-        scheduler.createProcesses(10);
-
-        scheduler.start();
 
         std::string command;
 
@@ -151,7 +155,29 @@ int main(int argc, char* argv[])
 
             std::cout << "\n  > " << command << "\n";
 
-            if (command == "screen -ls")
+            if (command == "exit")
+            {
+                std::cout << "  Shutting down...\n\n";
+                break;
+            }
+            else if (command == "initialize")
+            {
+                if (isInitialized) {
+                    std::cout << "  System has already been initialized.\n";
+                } else {
+                    bootSequence();
+                    std::cout << "  Reading config.txt...\n"; 
+                    
+                    scheduler.start();
+                    isInitialized = true;
+                    std::cout << "  System initialized successfully.\n";
+                }
+            }
+            else if (!isInitialized) 
+            {
+                std::cout << "  System not initialized. Please run 'initialize' first.\n";
+            }
+            else if (command == "screen -ls")
             {
                 scheduler.screen_ls();
             }
@@ -163,21 +189,15 @@ int main(int argc, char* argv[])
             {
                 printHelp();
             }
-            else if (command == "exit")
-            {
-                std::cout << "  Shutting down...\n\n";
-                break;
-            }
             else
             {
-                std::cout
-                    << "  Unknown command: '"
-                    << command
-                    << "'. Type 'help'.\n";
+                std::cout << "  Unknown command: '" << command << "'. Type 'help'.\n";
             }
         }
 
-        scheduler.stop();
+        if (isInitialized) {
+            scheduler.stop();
+        }
 
         return 0;
     }

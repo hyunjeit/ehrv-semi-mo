@@ -1,6 +1,9 @@
 #include "scheduler/FCFSScheduler.h"
 #include "core/GUIApplication.h"
 
+#include <unordered_map>
+#include <fstream>
+#include <sstream>
 #include <iostream>
 #include <string>
 #include <thread>
@@ -118,6 +121,28 @@ static void printHelp()
         << "\n";
 }
 
+// read key value pairs inside config.txt
+static std::unordered_map<std::string, std::string> loadConfig(const std::string& filename){
+    std::unordered_map<std::string, std::string> config;
+    std::ifstream file(filename);
+    
+    if (!file.is_open()){
+        std::cout << "  Error: Could not open " << filename << "\n";
+        return config;
+    }
+
+    std::string line;
+    while (std::getline(file, line)){
+        std::istringstream iss(line);
+        std::string key, value;
+        
+        if (iss >> key >> value){
+            config[key] = value;
+        }
+    }
+    return config;
+}
+
 int main(int argc, char* argv[])
 {
     bool consoleMode = false;
@@ -167,6 +192,12 @@ int main(int argc, char* argv[])
                 } else {
                     bootSequence();
                     std::cout << "  Reading config.txt...\n"; 
+
+                    auto config = loadConfig("config.txt");
+                    if (config.empty()) {
+                        std::cout << "  Config missing or empty.\n";
+                        continue;
+                    }
                     
                     scheduler.start();
                     isInitialized = true;
